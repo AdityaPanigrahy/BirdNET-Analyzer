@@ -3,9 +3,9 @@
 import os
 import sys
 import warnings
-
+import datetime
 import numpy as np
-
+from tensorflow.keras.callbacks import TensorBoard
 import birdnet_analyzer.config as cfg
 import birdnet_analyzer.utils as utils
 
@@ -33,6 +33,8 @@ M_INTERPRETER: tflite.Interpreter = None
 PBMODEL = None
 C_PBMODEL = None
 
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 def resetCustomClassifier():
     global C_INTERPRETER
@@ -293,7 +295,7 @@ def trainLinearClassifier(
 
     # Train model
     history = classifier.fit(
-        x_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(x_val, y_val), callbacks=callbacks
+        x_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(x_val, y_val), callbacks=[tensorboard_callback]
     )
 
     return classifier, history
