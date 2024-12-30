@@ -209,6 +209,12 @@ Learn more at: https://github.com/ssciwr/faunanet[faunanet]
 ecoSound-web is a web application for ecoacoustics to manage, re-sample, navigate, visualize, annotate, and analyze soundscape recordings. It can execute BirdNET on recording batches and is currently being developed at INRAE, France.
 
 Learn more at: https://f1000research.com/articles/9-1224/v3[F1000Research] and https://github.com/ecomontec/ecoSound-web[GitHub]
+
+| image:https://tuc.cloud/index.php/s/p6qb25SqEbLExkQ/download/ribbit_logo.png[Ribbit,300,link=https://ribbit.edi.eco/ ]
+| *Ribbit* + 
+Record frog calls and the web app will tell you the species. Clip it, Ribbit! The app uses a custom classifier built with BirdNET embeddings to identify frog species and gives nature enthusiasts the possibility to learn more about amphibians.
+
+Learn more at: https://ribbit.edi.eco[ribbit.edi.eco]
 |===
 
 *Other cool projects:*
@@ -819,12 +825,11 @@ Russian: Александр Цветков (cau@yandex.ru, radio call sign: R1BA
 == Funding
 
 This project is supported by Jake Holshuh (Cornell class of `'69) and The Arthur Vining Davis Foundations.
-Our work in the K.
-Lisa Yang Center for Conservation Bioacoustics is made possible by the generosity of K.
-Lisa Yang to advance innovative conservation technologies to inspire and inform the conservation of wildlife and habitats. 
+Our work in the K. Lisa Yang Center for Conservation Bioacoustics is made possible by the generosity of K. Lisa Yang to advance innovative conservation technologies to inspire and inform the conservation of wildlife and habitats. 
 
-The German Federal Ministry of Education and Research is funding the development of BirdNET through the project "BirdNET+" (FKZ 01|S22072).
-Additionally, the German Federal Ministry of Environment, Nature Conservation and Nuclear Safety is funding the development of BirdNET through the project "DeepBirdDetect" (FKZ 67KI31040E).
+The development of BirdNET is supported by the German Federal Ministry of Education and Research through the project “BirdNET+” (FKZ 01|S22072). 
+The German Federal Ministry for the Environment, Nature Conservation and Nuclear Safety contributes through the “DeepBirdDetect” project (FKZ 67KI31040E). 
+In addition, the Deutsche Bundesstiftung Umwelt supports BirdNET through the project “RangerSound” (project 39263/01).
 
 == Partners
 

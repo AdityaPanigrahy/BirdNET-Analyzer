@@ -1,3 +1,5 @@
+import base64
+import io
 import os
 import random
 from functools import partial
@@ -5,6 +7,7 @@ from functools import partial
 import gradio as gr
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 from scipy.special import expit
 from sklearn import linear_model
 
@@ -43,6 +46,7 @@ def build_review_tab():
 
     def create_log_plot(positives, negatives, fig_num=None):
         f = plt.figure(fig_num, figsize=(12, 6))
+        f.tight_layout()
         f.set_dpi(300)
         f.clf()
 
@@ -99,7 +103,9 @@ def build_review_tab():
 
             box = ax.get_position()
             ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-            ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+
+            if any(threshold <= 1 for threshold in thresholds):
+                ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
 
         if len(y_val) > 0:
             ax.scatter(x_vals, y_val, 2)
@@ -137,7 +143,11 @@ def build_review_tab():
 
             with gr.Column() as review_item_col:
                 with gr.Row():
-                    spectrogram_image = gr.Plot(label=loc.localize("review-tab-spectrogram-plot-label"))
+                    with gr.Column():
+                        spectrogram_image = gr.Plot(label=loc.localize("review-tab-spectrogram-plot-label"), show_label=False)
+                        with gr.Row():
+                            spectrogram_dl_btn = gr.Button("Download spectrogram", size="sm")
+                            regression_dl_btn = gr.Button("Download regression", size="sm")
 
                     with gr.Column():
                         with gr.Row():
@@ -145,6 +155,7 @@ def build_review_tab():
                             undo_btn = gr.Button(loc.localize("review-tab-undo-button-label"))
                         positive_btn = gr.Button(loc.localize("review-tab-pos-button-label"))
                         negative_btn = gr.Button(loc.localize("review-tab-neg-button-label"))
+
                         with gr.Group():
                             review_audio = gr.Audio(
                                 type="filepath", sources=[], show_download_button=False, autoplay=True
@@ -297,11 +308,13 @@ def build_review_tab():
                 update_dict |= {
                     review_item_col: gr.Column(visible=True),
                     review_audio: gr.Audio(value=todo_files[0], label=os.path.basename(todo_files[0])),
-                    spectrogram_image: utils.spectrogram_from_file(todo_files[0], 1),
+                    spectrogram_image: utils.spectrogram_from_file(todo_files[0]),
                     no_samles_label: gr.Label(visible=False),
                 }
             else:
                 update_dict |= {review_item_col: gr.Column(visible=False), no_samles_label: gr.Label(visible=True)}
+
+            update_dict[regression_dl_btn] = gr.Button(interactive=update_dict[species_regression_plot].constructor_args["visible"])
 
             return update_dict
 
@@ -340,6 +353,21 @@ def build_review_tab():
         def toggle_autoplay(value):
             return gr.Audio(autoplay=value)
 
+        def download_plot(plot, filename=""):
+            imgdata = base64.b64decode(plot.plot.split(",", 1)[1])
+            res = gu._WINDOW.create_file_dialog(
+                gu.webview.SAVE_DIALOG, file_types=("PNG (*.png)", "Webp (*.webp)", "JPG (*.jpg)"), save_filename=filename
+            )
+
+            if res:
+                if res.endswith(".webp"):
+                    with open(res, "wb") as f:
+                        f.write(imgdata)
+                else:
+                    output_format = res.rsplit(".", 1)[-1].upper()
+                    img = Image.open(io.BytesIO(imgdata))
+                    img.save(res, output_format if output_format in ["PNG", "JPEG"] else "PNG")
+
         autoplay_checkbox.change(toggle_autoplay, inputs=autoplay_checkbox, outputs=review_audio)
 
         review_change_output = [
@@ -353,7 +381,15 @@ def build_review_tab():
             file_count_matrix,
             species_regression_plot,
             undo_btn,
+            regression_dl_btn
         ]
+
+        spectrogram_dl_btn.click(
+            partial(download_plot, filename="spectrogram"), show_progress=False, inputs=spectrogram_image
+        )
+        regression_dl_btn.click(
+            partial(download_plot, filename="regression"), show_progress=False, inputs=species_regression_plot
+        )
 
         species_dropdown.change(
             select_subdir,
